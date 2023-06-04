@@ -1,29 +1,17 @@
+use minigrep::Args;
 use std::env;
-use std::fs;
+use std::process;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    let cfg = parse_args(&args).expect("expect args should parse");
-    println!("Reading file: {}!", cfg.file_path);
+    let cfg = Args::build(&args).unwrap_or_else(|err| {
+        println!("error parsing args: {err}");
+        process::exit(1);
+    });
 
-    let contents = fs::read_to_string(&cfg.file_path).expect("Should have been able to read file");
-    println!("With text:\n{}", contents);
-}
-
-#[derive(Debug)]
-struct Args {
-    query: String,
-    file_path: String,
-}
-
-fn parse_args(args: &[String]) -> Result<Args, &'static str> {
-    if args.len() < 3 {
-        return Err("not enough args");
+    if let Err(e) = minigrep::run(cfg) {
+        println!("application error: {e}");
+        process::exit(1);
     }
-
-    let query = args[1].clone();
-    let file_path = args[2].clone();
-
-    return Ok(Args { query, file_path });
 }
