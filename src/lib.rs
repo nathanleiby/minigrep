@@ -27,7 +27,6 @@ impl Args {
 }
 
 pub fn run(cfg: Args) -> Result<(), Box<dyn Error>> {
-    // println!("Reading file: {}!", cfg.file_path);
     let contents = fs::read_to_string(&cfg.file_path)?;
 
     let results = if cfg.case_insensitive {
